@@ -1,0 +1,44 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Coding Standards and Best Practices
+
+## TypeScript Usage
+
+- Use TypeScript for all new code
+- Enable strict mode in TypeScript configuration
+- Define proper interfaces and types for all data structures
+
+## React Components
+
+- Use functional components with hooks
+- Follow component composition patterns
+- Keep components focused and single-responsibility
+- Use proper prop typing
+
+## File Naming
+
+- React components: PascalCase (e.g., `CommentsTable.tsx`)
+- Utilities and hooks: camelCase (e.g., `useDocxParser.ts`)
+- Test files: `*.test.ts` or `*.test.tsx`
+
+## Code Organization
+
+- Group related functionality in dedicated directories
+- Keep component files relatively small (< 300 lines)
+- Extract complex logic into custom hooks
+- Use meaningful variable and function names
+
+## Error Handling
+
+- Implement proper error boundaries
+- Use try-catch blocks for file operations
+- Provide meaningful error messages to users
+
+## Performance
+
+- Implement proper memoization where needed
+- Avoid unnecessary re-renders
+- Optimize file processing operations

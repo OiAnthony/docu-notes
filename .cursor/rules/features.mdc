@@ -1,0 +1,44 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# DocuNotes Features and Functionality
+
+## Core Features
+
+### Document Processing
+- Support for `.docx` file format
+- In-browser file processing using JSZip
+- Extraction of comments and annotations
+- Privacy-focused (no server uploads)
+
+### User Interface
+- Drag-and-drop file upload
+- Table view of extracted comments
+- Excel export functionality
+- Modern, responsive design
+
+### Data Management
+- Comment extraction and parsing
+- Data transformation and formatting
+- Excel file generation
+- Error handling and validation
+
+## Implementation Details
+
+### File Processing
+The main file processing logic is implemented in the following files:
+- [src/lib/parseDocxComments.ts](mdc:src/lib/parseDocxComments.ts)
+- [src/lib/exportToExcel.ts](mdc:src/lib/exportToExcel.ts)
+
+### UI Components
+Key UI components are located in:
+- [src/components/Dropzone.tsx](mdc:src/components/Dropzone.tsx)
+- [src/components/CommentsTable.tsx](mdc:src/components/CommentsTable.tsx)
+
+## Future Enhancements
+- Comment location tracking
+- Search and filter functionality
+- Batch processing of multiple files
+- Custom export templates
