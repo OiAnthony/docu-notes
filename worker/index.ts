@@ -11,7 +11,7 @@ export default {
     // 处理 API 请求
     if (url.pathname.startsWith("/api/")) {
       return Response.json({
-        message: "Hello from Docu-Notes API!",
+        message: "Hello from DocuNotes API!",
         timestamp: new Date().toISOString()
       });
     }
