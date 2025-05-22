@@ -1,0 +1,65 @@
+import JSZip from 'jszip'
+import { XMLParser } from 'fast-xml-parser'
+
+export interface Comment {
+  id: string
+  author: string
+  date: string
+  text: string
+}
+
+export async function parseDocxComments(file: File): Promise<Comment[]> {
+  try {
+    const buffer = await file.arrayBuffer()
+    const zip = await JSZip.loadAsync(buffer)
+    
+    const commentXml = await zip.file('word/comments.xml')?.async('string')
+    if (!commentXml) {
+      throw new Error('该文档中没有找到批注')
+    }
+
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@_'
+    })
+    
+    const json = parser.parse(commentXml)
+    const comments = json['w:comments']?.['w:comment'] || []
+    
+    // 确保 comments 始终是数组
+    const commentsArray = Array.isArray(comments) ? comments : [comments]
+    
+    return commentsArray.map((c: any) => ({
+      id: c['@_w:id'] || '',
+      author: c['@_w:author'] || '未知作者',
+      date: new Date(c['@_w:date']).toLocaleString('zh-CN'),
+      text: extractCommentText(c)
+    }))
+  } catch (error) {
+    console.error('解析文档批注时出错:', error)
+    throw new Error('解析文档批注失败：' + (error instanceof Error ? error.message : '未知错误'))
+  }
+}
+
+function extractCommentText(comment: any): string {
+  try {
+    const paragraphs = Array.isArray(comment['w:p']) ? comment['w:p'] : [comment['w:p']]
+    
+    return paragraphs
+      .map((p: any) => {
+        if (!p) return ''
+        const runs = Array.isArray(p['w:r']) ? p['w:r'] : [p['w:r']]
+        return runs
+          .map((r: any) => {
+            if (!r) return ''
+            return Array.isArray(r['w:t']) ? r['w:t'].join('') : r['w:t'] || ''
+          })
+          .join('')
+      })
+      .join('\n')
+      .trim()
+  } catch (error) {
+    console.error('提取批注文本时出错:', error)
+    return '批注文本解析失败'
+  }
+} 
