@@ -29,7 +29,7 @@ export default function App() {
     try {
       exportToExcel(comments)
       toast.success('成功导出 Excel 文件')
-    } catch (error: unknown) {
+    } catch {
       toast.error('导出 Excel 失败')
     }
   }

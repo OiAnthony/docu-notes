@@ -8,11 +8,26 @@ export interface Comment {
   text: string
 }
 
+interface CommentData {
+  '@_w:id': string;
+  '@_w:author': string;
+  '@_w:date': string;
+  'w:p': ParagraphData | ParagraphData[];
+}
+
+interface ParagraphData {
+  'w:r': RunData | RunData[];
+}
+
+interface RunData {
+  'w:t': string | string[];
+}
+
 export async function parseDocxComments(file: File): Promise<Comment[]> {
   try {
     const buffer = await file.arrayBuffer()
     const zip = await JSZip.loadAsync(buffer)
-    
+
     const commentXml = await zip.file('word/comments.xml')?.async('string')
     if (!commentXml) {
       throw new Error('该文档中没有找到批注')
@@ -22,14 +37,14 @@ export async function parseDocxComments(file: File): Promise<Comment[]> {
       ignoreAttributes: false,
       attributeNamePrefix: '@_'
     })
-    
+
     const json = parser.parse(commentXml)
     const comments = json['w:comments']?.['w:comment'] || []
-    
+
     // 确保 comments 始终是数组
     const commentsArray = Array.isArray(comments) ? comments : [comments]
-    
-    return commentsArray.map((c: any) => ({
+
+    return commentsArray.map((c: CommentData) => ({
       id: c['@_w:id'] || '',
       author: c['@_w:author'] || '未知作者',
       date: new Date(c['@_w:date']).toLocaleString('zh-CN'),
@@ -41,16 +56,16 @@ export async function parseDocxComments(file: File): Promise<Comment[]> {
   }
 }
 
-function extractCommentText(comment: any): string {
+function extractCommentText(comment: CommentData): string {
   try {
     const paragraphs = Array.isArray(comment['w:p']) ? comment['w:p'] : [comment['w:p']]
-    
+
     return paragraphs
-      .map((p: any) => {
+      .map((p: ParagraphData) => {
         if (!p) return ''
         const runs = Array.isArray(p['w:r']) ? p['w:r'] : [p['w:r']]
         return runs
-          .map((r: any) => {
+          .map((r: RunData) => {
             if (!r) return ''
             return Array.isArray(r['w:t']) ? r['w:t'].join('') : r['w:t'] || ''
           })
