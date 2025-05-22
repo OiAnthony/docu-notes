@@ -30,7 +30,7 @@ export async function parseDocxComments(file: File): Promise<Comment[]> {
 
     const commentXml = await zip.file('word/comments.xml')?.async('string')
     if (!commentXml) {
-      throw new Error('该文档中没有找到批注')
+      return []
     }
 
     const parser = new XMLParser({
