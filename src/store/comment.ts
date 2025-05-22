@@ -13,7 +13,7 @@ interface CommentState {
   setFilterText: (text: string) => void
 }
 
-export const useCommentStore = create<CommentState>((set, get) => ({
+export const useCommentStore = create<CommentState>((set) => ({
   comments: [],
   isLoading: false,
   sourceFile: null,

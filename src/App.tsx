@@ -1,21 +1,10 @@
 import { Dropzone } from './components/Dropzone'
 import { CommentTable } from './components/comment-table'
 import { useCommentStore } from './store/comment'
-import { Button } from './components/ui/button'
-import { toast } from 'sonner'
-import { exportToExcel } from './utils/exportToExcel'
 
 export default function App() {
   const { comments, isLoading, sourceFile, setSourceFile } = useCommentStore()
 
-  const handleExport = () => {
-    try {
-      exportToExcel(comments)
-      toast.success('成功导出 Excel 文件')
-    } catch {
-      toast.error('导出 Excel 失败')
-    }
-  }
 
   return (
     <div className="min-h-screen bg-background">
