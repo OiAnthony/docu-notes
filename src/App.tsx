@@ -1,29 +1,12 @@
-import { useState } from 'react'
 import { Dropzone } from './components/Dropzone'
-import { CommentsTable } from './components/CommentsTable'
-import { parseDocxComments } from './utils/parseDocxComments'
-import { exportToExcel } from './utils/exportToExcel'
-import type { Comment } from './utils/parseDocxComments'
+import { CommentTable } from './components/comment-table'
+import { useCommentStore } from './store/comment'
 import { Button } from './components/ui/button'
 import { toast } from 'sonner'
+import { exportToExcel } from './utils/exportToExcel'
 
 export default function App() {
-  const [comments, setComments] = useState<Comment[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleFile = async (file: File) => {
-    try {
-      setIsLoading(true)
-      const result = await parseDocxComments(file)
-      setComments(result)
-      toast.success(`成功提取 ${result.length} 条批注`)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : '处理文件时出错')
-      setComments([])
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const { comments, isLoading, sourceFile, setSourceFile } = useCommentStore()
 
   const handleExport = () => {
     try {
@@ -46,12 +29,14 @@ export default function App() {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-8">
-          <Dropzone
-            onFile={handleFile}
-            className={isLoading ? 'opacity-50 pointer-events-none' : ''}
-          />
-        </div>
+        {!sourceFile && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <Dropzone
+              onFile={setSourceFile}
+              className={isLoading ? 'opacity-50 pointer-events-none' : ''}
+            />
+          </div>
+        )}
 
         {isLoading && (
           <div className="text-center text-muted-foreground animate-pulse">
@@ -63,14 +48,11 @@ export default function App() {
           <div className="space-y-4 mt-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <h2 className="text-xl font-semibold">
-                批注列表（共 {comments.length} 条）
+                批注表格（共 {comments.length} 条）
               </h2>
-              <Button onClick={handleExport} size="lg" className="w-full sm:w-auto">
-                导出到 Excel
-              </Button>
             </div>
-            <div className="bg-card rounded-lg shadow-sm">
-              <CommentsTable data={comments} />
+            <div className="bg-card rounded-lg">
+              <CommentTable data={comments} />
             </div>
           </div>
         )}
