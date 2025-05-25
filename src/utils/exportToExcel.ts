@@ -4,11 +4,21 @@ import type { Comment } from './parseDocxComments'
 export function exportToExcel(comments: Comment[]) {
   try {
     // 准备导出数据
-    const exportData = comments.map(comment => ({
-      '作者': comment.author,
-      '日期': comment.date,
-      '批注内容': comment.text
-    }))
+    const exportData = comments.map(comment => {
+      // 格式化答复批注
+      const repliesText = comment.replies && comment.replies.length > 0
+        ? comment.replies.map(reply =>
+          `${reply.author} (${reply.date}): ${reply.text}`
+        ).join('\n\n')
+        : '无答复'
+
+      return {
+        '作者': comment.author,
+        '日期': comment.date,
+        '批注内容': comment.text,
+        '答复批注': repliesText
+      }
+    })
 
     // 创建工作簿和工作表
     const ws = XLSX.utils.json_to_sheet(exportData)
@@ -19,7 +29,8 @@ export function exportToExcel(comments: Comment[]) {
     const colWidths = [
       { wch: 15 }, // 作者
       { wch: 20 }, // 日期
-      { wch: 50 }  // 批注内容
+      { wch: 50 }, // 批注内容
+      { wch: 60 }  // 答复批注
     ]
     ws['!cols'] = colWidths
 

@@ -65,4 +65,30 @@ export const columns: ColumnDef<Comment>[] = [
       </div>
     ),
   },
+  {
+    accessorKey: "replies",
+    header: "答复批注",
+    cell: ({ row }) => {
+      const replies = row.getValue("replies") as Comment[]
+
+      if (!replies || replies.length === 0) {
+        return <div className="text-muted-foreground text-sm">无答复</div>
+      }
+
+      return (
+        <div className="space-y-2">
+          {replies.map((reply, index) => (
+            <div key={`${reply.id}-${index}`} className="border-l-2 border-blue-200 pl-3 py-1">
+              <div className="text-xs text-muted-foreground mb-1">
+                {reply.author} · {reply.date}
+              </div>
+              <div className="text-sm whitespace-pre-wrap break-words">
+                {reply.text}
+              </div>
+            </div>
+          ))}
+        </div>
+      )
+    },
+  },
 ] 
