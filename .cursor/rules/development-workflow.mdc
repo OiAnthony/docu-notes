@@ -1,0 +1,137 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Development Workflow and Tools
+
+## Development Environment
+
+### Prerequisites
+- Node.js (latest LTS version)
+- Bun package manager (as specified in [bun.lock](mdc:bun.lock))
+- Cloudflare account for deployment
+
+### Setup Commands
+```bash
+# Install dependencies
+bun install
+
+# Start development server
+bun run dev
+
+# Build for production
+bun run build
+
+# Preview production build locally
+bun run preview
+
+# Deploy to Cloudflare Workers
+bun run deploy
+```
+
+## Development Scripts
+
+Key scripts defined in [package.json](mdc:package.json):
+- `dev`: Start Vite development server
+- `build`: TypeScript compilation + Vite build
+- `lint`: Run ESLint for code quality
+- `preview`: Local preview with Wrangler
+- `deploy`: Build and deploy to Cloudflare
+
+## Code Quality Tools
+
+### ESLint Configuration
+- Configuration in [eslint.config.js](mdc:eslint.config.js)
+- Includes React hooks and refresh plugins
+- TypeScript ESLint integration
+- Run with `bun run lint`
+
+### TypeScript Configuration
+- Main config: [tsconfig.json](mdc:tsconfig.json)
+- App-specific: [tsconfig.app.json](mdc:tsconfig.app.json)
+- Node tools: [tsconfig.node.json](mdc:tsconfig.node.json)
+- Worker-specific: [tsconfig.worker.json](mdc:tsconfig.worker.json)
+
+## Build and Deployment
+
+### Vite Configuration
+- Configuration in [vite.config.ts](mdc:vite.config.ts)
+- Includes React, Tailwind CSS, and Cloudflare plugins
+- Path aliases configured for clean imports (`@/` → `src/`)
+
+### Cloudflare Workers
+- Configuration in [wrangler.toml](mdc:wrangler.toml)
+- Edge deployment for global performance
+- Serverless architecture
+
+## UI Development
+
+### Component Library
+- Built on shadcn/ui components in [src/components/ui/](mdc:src/components/ui/)
+- Configuration in [components.json](mdc:components.json)
+- Radix UI primitives for accessibility
+- Tailwind CSS 4 for styling
+
+### Theme System
+- Dark/light mode support with next-themes
+- CSS variables for consistent theming
+- Responsive design patterns
+
+## File Processing Workflow
+
+### Document Upload
+1. User drops/selects DOCX file in [Dropzone.tsx](mdc:src/components/Dropzone.tsx)
+2. File validation and type checking
+3. State update via [comment.ts](mdc:src/store/comment.ts) store
+
+### Comment Extraction
+1. DOCX parsing with [parseDocxComments.ts](mdc:src/utils/parseDocxComments.ts)
+2. XML processing using fast-xml-parser
+3. Comment data normalization and formatting
+
+### Data Export
+1. Excel generation with [exportToExcel.ts](mdc:src/utils/exportToExcel.ts)
+2. Proper formatting and structure
+3. Client-side download
+
+## Testing Strategy
+
+### Unit Testing
+- Test utility functions in `src/utils/`
+- Mock file operations for consistent testing
+- Test data transformation logic
+
+### Component Testing
+- Test user interactions and component behavior
+- Mock state management for isolated testing
+- Accessibility testing with proper ARIA attributes
+
+### Integration Testing
+- End-to-end file processing workflow
+- Error handling scenarios
+- Performance testing with large files
+
+## Performance Monitoring
+
+### Bundle Analysis
+- Monitor bundle size for edge deployment
+- Optimize imports and dependencies
+- Use dynamic imports for code splitting
+
+### Runtime Performance
+- Monitor file processing performance
+- Optimize table rendering for large datasets
+- Implement proper loading states
+
+## Security Considerations
+
+### Client-Side Processing
+- All file processing happens in browser
+- No server uploads for privacy
+- Secure file handling practices
+
+### Dependencies
+- Regular security audits of npm packages
+- Keep dependencies updated
+- Use trusted libraries only

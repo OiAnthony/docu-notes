@@ -8,37 +8,61 @@ alwaysApply: false
 ## Core Features
 
 ### Document Processing
-- Support for `.docx` file format
-- In-browser file processing using JSZip
-- Extraction of comments and annotations
-- Privacy-focused (no server uploads)
+- Support for `.docx` file format (Microsoft Word documents)
+- Client-side file processing using JSZip and fast-xml-parser
+- Extraction of comments and annotations from Word documents
+- Privacy-focused approach (no server uploads, all processing in browser)
 
 ### User Interface
-- Drag-and-drop file upload
-- Table view of extracted comments
-- Excel export functionality
-- Modern, responsive design
+- Modern drag-and-drop file upload interface
+- Responsive table view of extracted comments using TanStack Table
+- Excel export functionality for comment data
+- Clean, accessible design using shadcn/ui components
+- Dark/light theme support with next-themes
 
 ### Data Management
-- Comment extraction and parsing
-- Data transformation and formatting
-- Excel file generation
-- Error handling and validation
+- Real-time comment extraction and parsing
+- Structured data transformation and formatting
+- Excel file generation with proper formatting
+- Comprehensive error handling and user feedback
+- State management with Zustand
 
 ## Implementation Details
 
 ### File Processing
-The main file processing logic is implemented in the following files:
-- [src/lib/parseDocxComments.ts](mdc:src/lib/parseDocxComments.ts)
-- [src/lib/exportToExcel.ts](mdc:src/lib/exportToExcel.ts)
+The main file processing logic is implemented in:
+- [src/utils/parseDocxComments.ts](mdc:src/utils/parseDocxComments.ts): Core DOCX parsing and comment extraction
+- [src/utils/exportToExcel.ts](mdc:src/utils/exportToExcel.ts): Excel export functionality
+
+### State Management
+- [src/store/comment.ts](mdc:src/store/comment.ts): Zustand store for comment data and application state
 
 ### UI Components
 Key UI components are located in:
-- [src/components/Dropzone.tsx](mdc:src/components/Dropzone.tsx)
-- [src/components/CommentsTable.tsx](mdc:src/components/CommentsTable.tsx)
+- [src/components/Dropzone.tsx](mdc:src/components/Dropzone.tsx): File upload with drag-and-drop
+- [src/components/comment-table/](mdc:src/components/comment-table/): Comment table components
+- [src/components/ui/](mdc:src/components/ui/): Reusable UI components (shadcn/ui)
+
+### Main Application
+- [src/App.tsx](mdc:src/App.tsx): Main application component orchestrating the workflow
+
+## Technical Features
+
+### Performance Optimizations
+- Client-side processing to avoid server load
+- Efficient XML parsing with fast-xml-parser
+- Optimized table rendering with TanStack Table
+- Proper React memoization and state management
+
+### User Experience
+- Real-time processing feedback
+- Intuitive file upload interface
+- Responsive design for all screen sizes
+- Accessible components following ARIA guidelines
 
 ## Future Enhancements
-- Comment location tracking
-- Search and filter functionality
+- Comment location tracking within documents
+- Advanced search and filter functionality
 - Batch processing of multiple files
-- Custom export templates
+- Custom export templates and formats
+- Comment categorization and tagging

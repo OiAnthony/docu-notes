@@ -1,0 +1,191 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Data Structures and API Patterns
+
+## Core Data Types
+
+### Comment Data Structure
+The main data structure for extracted comments (defined in state management):
+
+```typescript
+interface Comment {
+  id: string;           // Unique identifier
+  author: string;       // Comment author name
+  text: string;         // Comment content
+  date: string;         // Comment creation date
+  context?: string;     // Surrounding text context
+}
+```
+
+### Application State
+Managed by Zustand store in [src/store/comment.ts](mdc:src/store/comment.ts):
+
+```typescript
+interface CommentStore {
+  comments: Comment[];          // Array of extracted comments
+  isLoading: boolean;          // Processing state
+  sourceFile: File | null;    // Uploaded DOCX file
+  error: string | null;       // Error state
+  
+  // Actions
+  setSourceFile: (file: File) => void;
+  setComments: (comments: Comment[]) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  reset: () => void;
+}
+```
+
+## File Processing Pipeline
+
+### DOCX Structure
+Understanding of DOCX file format for processing in [src/utils/parseDocxComments.ts](mdc:src/utils/parseDocxComments.ts):
+
+- DOCX files are ZIP archives containing XML files
+- Comments are stored in `word/comments.xml`
+- Document content in `word/document.xml`
+- Relationships defined in `word/_rels/document.xml.rels`
+
+### XML Parsing Configuration
+Configuration for fast-xml-parser:
+
+```typescript
+const parserOptions = {
+  ignoreAttributes: false,
+  attributeNamePrefix: "@_",
+  textNodeName: "#text",
+  parseAttributeValue: true
+};
+```
+
+### Comment Extraction Process
+1. **File Validation**: Check file type and size
+2. **ZIP Extraction**: Extract XML files using JSZip
+3. **XML Parsing**: Parse comments.xml and document.xml
+4. **Data Transformation**: Convert XML to Comment objects
+5. **State Update**: Update Zustand store with extracted data
+
+## Export Data Format
+
+### Excel Export Structure
+Implemented in [src/utils/exportToExcel.ts](mdc:src/utils/exportToExcel.ts):
+
+```typescript
+interface ExcelRow {
+  序号: number;        // Row number
+  作者: string;        // Author name
+  批注内容: string;    // Comment text
+  创建时间: string;    // Creation date
+  上下文: string;      // Context (if available)
+}
+```
+
+### Export Configuration
+- File format: `.xlsx`
+- Encoding: UTF-8 for Chinese character support
+- Headers: Chinese labels for user-friendly display
+- Styling: Basic formatting for readability
+
+## Error Handling Patterns
+
+### Error Types
+Common error scenarios and handling:
+
+```typescript
+enum ErrorType {
+  FILE_TYPE_ERROR = "不支持的文件格式",
+  FILE_SIZE_ERROR = "文件大小超出限制",
+  PARSING_ERROR = "文档解析失败",
+  EXPORT_ERROR = "导出失败"
+}
+```
+
+### Error State Management
+- Errors stored in Zustand state
+- User-friendly error messages in Chinese
+- Automatic error clearing on new operations
+- Graceful degradation for partial failures
+
+## UI Data Flow
+
+### Component Props Patterns
+Consistent prop patterns across components:
+
+```typescript
+// File upload component
+interface DropzoneProps {
+  onFile: (file: File) => void;
+  className?: string;
+  disabled?: boolean;
+}
+
+// Table component
+interface CommentTableProps {
+  data: Comment[];
+  onExport?: () => void;
+  loading?: boolean;
+}
+```
+
+### State Selectors
+Efficient state selection patterns:
+
+```typescript
+// Select only needed data
+const comments = useCommentStore(state => state.comments);
+const isLoading = useCommentStore(state => state.isLoading);
+
+// Derived state
+const commentCount = useCommentStore(state => state.comments.length);
+const hasComments = useCommentStore(state => state.comments.length > 0);
+```
+
+## Performance Considerations
+
+### Data Processing
+- Stream processing for large files
+- Chunked parsing to avoid blocking UI
+- Memory-efficient XML parsing
+- Proper cleanup of temporary objects
+
+### State Management
+- Minimal state updates
+- Proper dependency arrays in selectors
+- Avoid unnecessary re-renders
+- Efficient data normalization
+
+### Table Rendering
+- Virtual scrolling for large datasets (TanStack Table)
+- Memoized cell renderers
+- Optimized sorting and filtering
+- Progressive loading for better UX
+
+## Validation Patterns
+
+### File Validation
+```typescript
+const validateFile = (file: File): boolean => {
+  const validTypes = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  const maxSize = 50 * 1024 * 1024; // 50MB
+  
+  return validTypes.includes(file.type) && file.size <= maxSize;
+};
+```
+
+### Data Validation
+- XML structure validation
+- Comment data completeness checks
+- Date format validation
+- Text encoding validation
+
+## Internationalization
+
+### Language Support
+- Primary language: Simplified Chinese
+- UI labels and messages in Chinese
+- Error messages localized
+- Date formatting for Chinese locale
+- Proper UTF-8 handling for Chinese characters

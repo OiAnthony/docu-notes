@@ -7,38 +7,87 @@ alwaysApply: false
 
 ## TypeScript Usage
 
-- Use TypeScript for all new code
-- Enable strict mode in TypeScript configuration
+- Use TypeScript for all code with strict mode enabled
 - Define proper interfaces and types for all data structures
+- Leverage TypeScript's type inference where appropriate
+- Use proper generic types for reusable components and utilities
+- Follow the project's TypeScript configurations in [tsconfig.json](mdc:tsconfig.json)
 
 ## React Components
 
-- Use functional components with hooks
-- Follow component composition patterns
-- Keep components focused and single-responsibility
-- Use proper prop typing
+- Use functional components with hooks exclusively
+- Follow component composition patterns over inheritance
+- Keep components focused and follow single-responsibility principle
+- Use proper prop typing with TypeScript interfaces
+- Implement proper error boundaries for robust error handling
+- Use React 19 features and concurrent features appropriately
 
-## File Naming
+## State Management
 
-- React components: PascalCase (e.g., `CommentsTable.tsx`)
-- Utilities and hooks: camelCase (e.g., `useDocxParser.ts`)
+- Use Zustand for global state management as implemented in [src/store/comment.ts](mdc:src/store/comment.ts)
+- Keep state minimal and normalized
+- Use proper state selectors to avoid unnecessary re-renders
+- Implement proper loading and error states
+
+## UI Components and Styling
+
+- Use shadcn/ui components from [src/components/ui/](mdc:src/components/ui/) for consistency
+- Follow Tailwind CSS 4 conventions for styling
+- Implement responsive design patterns
+- Use proper semantic HTML and ARIA attributes for accessibility
+- Support both light and dark themes using next-themes
+
+## File Naming and Organization
+
+- React components: PascalCase (e.g., `CommentTable.tsx`)
+- Utilities and hooks: camelCase (e.g., `parseDocxComments.ts`)
+- Store files: camelCase (e.g., `comment.ts`)
 - Test files: `*.test.ts` or `*.test.tsx`
+- Use index files for clean imports where appropriate
 
 ## Code Organization
 
 - Group related functionality in dedicated directories
-- Keep component files relatively small (< 300 lines)
-- Extract complex logic into custom hooks
+- Keep component files focused and under 300 lines when possible
+- Extract complex logic into custom hooks or utility functions
 - Use meaningful variable and function names
+- Follow the established directory structure in [src/](mdc:src/)
 
 ## Error Handling
 
-- Implement proper error boundaries
-- Use try-catch blocks for file operations
+- Implement comprehensive error boundaries
+- Use try-catch blocks for all file operations and async code
 - Provide meaningful error messages to users
+- Log errors appropriately for debugging
+- Handle edge cases gracefully
 
-## Performance
+## Performance Optimization
 
-- Implement proper memoization where needed
-- Avoid unnecessary re-renders
-- Optimize file processing operations
+- Use React.memo() for expensive components
+- Implement proper dependency arrays in useEffect and useMemo
+- Optimize file processing operations for large documents
+- Use proper loading states and progressive enhancement
+- Avoid unnecessary re-renders through proper state design
+
+## File Processing Standards
+
+- Use JSZip for DOCX file handling as in [src/utils/parseDocxComments.ts](mdc:src/utils/parseDocxComments.ts)
+- Implement proper XML parsing with fast-xml-parser
+- Handle file processing errors gracefully
+- Provide progress feedback for long operations
+- Ensure client-side processing for privacy
+
+## Testing and Quality
+
+- Write unit tests for utility functions
+- Test component behavior and user interactions
+- Use proper TypeScript types to catch errors at compile time
+- Follow ESLint configuration in [eslint.config.js](mdc:eslint.config.js)
+- Ensure code passes all linting and type checking
+
+## Deployment and Build
+
+- Follow Cloudflare Workers deployment patterns
+- Use proper environment configurations
+- Optimize bundle size for edge deployment
+- Test builds locally with Wrangler before deployment

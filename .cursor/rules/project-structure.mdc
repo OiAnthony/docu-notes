@@ -5,21 +5,44 @@ alwaysApply: false
 ---
 # DocuNotes Project Structure
 
-This is a React application for extracting and managing Word document comments.
+This is a React + TypeScript + Vite application for extracting and managing Word document comments, deployed on Cloudflare Workers.
 
 ## Key Directories
 
-- `src/components/`: React components including UI components
+- `src/components/`: React components
+  - `ui/`: Reusable UI components built with Radix UI and shadcn/ui
+  - `comment-table/`: Comment table specific components
+  - [Dropzone.tsx](mdc:src/components/Dropzone.tsx): File upload component
+- `src/store/`: Zustand state management
+  - [comment.ts](mdc:src/store/comment.ts): Comment state management
+- `src/utils/`: Utility functions
+  - [parseDocxComments.ts](mdc:src/utils/parseDocxComments.ts): DOCX comment extraction
+  - [exportToExcel.ts](mdc:src/utils/exportToExcel.ts): Excel export functionality
+- `src/lib/`: Shared utilities and configurations
 - `src/hooks/`: Custom React hooks
-- `src/lib/`: Utility functions and business logic
 - `src/assets/`: Static assets and resources
+- `worker/`: Cloudflare Worker configuration
+- `tests/`: Test files and test assets
 
 ## Main Files
 
-- [vite.config.ts](mdc:vite.config.ts): Vite configuration
-- [tsconfig.json](mdc:tsconfig.json): TypeScript configuration
+- [src/main.tsx](mdc:src/main.tsx): Application entry point
+- [src/App.tsx](mdc:src/App.tsx): Main application component
+- [vite.config.ts](mdc:vite.config.ts): Vite configuration with Cloudflare plugin
+- [wrangler.toml](mdc:wrangler.toml): Cloudflare Workers configuration
 - [package.json](mdc:package.json): Project dependencies and scripts
-- [components.json](mdc:components.json): UI component configurations
+- [components.json](mdc:components.json): shadcn/ui component configurations
+- [tsconfig.json](mdc:tsconfig.json): TypeScript configuration
+- [tsconfig.worker.json](mdc:tsconfig.worker.json): Worker-specific TypeScript config
+
+## Technology Stack
+
+- **Frontend**: React 19 + TypeScript + Vite
+- **UI**: Tailwind CSS 4 + Radix UI + shadcn/ui
+- **State Management**: Zustand
+- **File Processing**: JSZip + fast-xml-parser
+- **Data Export**: xlsx library
+- **Deployment**: Cloudflare Workers + Pages
 
 ## Documentation
 
