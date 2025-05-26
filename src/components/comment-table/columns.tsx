@@ -34,6 +34,13 @@ function SortableHeader({
 
 export const columns: ColumnDef<Comment>[] = [
   {
+    accessorKey: "id",
+    header: "批注ID",
+    cell: ({ row }) => (
+      <div className="text-xs font-mono text-muted-foreground">{row.getValue("id")}</div>
+    ),
+  },
+  {
     accessorKey: "author",
     header: ({ column }) => (
       <SortableHeader column={column}>作者</SortableHeader>
@@ -64,6 +71,30 @@ export const columns: ColumnDef<Comment>[] = [
         </div>
       </div>
     ),
+  },
+  {
+    accessorKey: "section",
+    header: "所属章节",
+    cell: ({ row }) => {
+      const section = row.getValue("section") as string
+      return (
+        <div className="text-sm">
+          {section || <span className="text-muted-foreground">未知章节</span>}
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "originalText",
+    header: "批注原文",
+    cell: ({ row }) => {
+      const originalText = row.getValue("originalText") as string
+      return (
+        <div className="text-sm whitespace-pre-wrap break-words max-w-xs">
+          {originalText || <span className="text-muted-foreground">无原文</span>}
+        </div>
+      )
+    },
   },
   {
     accessorKey: "replies",
