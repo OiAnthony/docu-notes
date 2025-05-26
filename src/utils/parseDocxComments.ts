@@ -346,9 +346,9 @@ function extractTitleWithNumber(titleText: string): string {
 
 
 // 提取章节位置信息
-function extractSectionPositions(xmlString: string, styleMap: Map<string, string>): Array<{ position: number; title: string }> {
+function extractSectionPositions(xmlString: string, styleMap: Map<string, string>): Array<{ position: number; title: string; level: number }> {
   try {
-    const sectionPositions: Array<{ position: number; title: string }> = []
+    const sectionPositions: Array<{ position: number; title: string; level: number }> = []
     
     // 查找所有段落样式标记
     const styleMatches = [...xmlString.matchAll(/<w:pStyle w:val="([^"]+)"\/>/g)]
@@ -368,10 +368,14 @@ function extractSectionPositions(xmlString: string, styleMap: Map<string, string
           const titleText = extractTextFromXmlRange(paragraphXml)
           
           if (titleText && titleText !== '【图片】') {
+            // 获取标题级别
+            const level = getHeadingLevel(styleId, styleMap)
             const titleWithNumber = extractTitleWithNumber(titleText.trim())
+            
             sectionPositions.push({
               position,
-              title: titleWithNumber
+              title: titleWithNumber,
+              level
             })
           }
         }
@@ -381,7 +385,10 @@ function extractSectionPositions(xmlString: string, styleMap: Map<string, string
     // 按位置排序
     sectionPositions.sort((a, b) => a.position - b.position)
     
-    return sectionPositions
+    // 智能推断章节序号
+    const sectionsWithNumbers = inferSectionNumbers(sectionPositions)
+    
+    return sectionsWithNumbers
   } catch (error) {
     console.error('提取章节位置时出错:', error)
     return []
@@ -389,7 +396,7 @@ function extractSectionPositions(xmlString: string, styleMap: Map<string, string
 }
 
 // 根据位置查找最近的章节
-function findNearestSection(position: number, sectionPositions: Array<{ position: number; title: string }>): string {
+function findNearestSection(position: number, sectionPositions: Array<{ position: number; title: string; level: number }>): string {
   try {
     if (sectionPositions.length === 0) {
       return '未知章节'
@@ -410,5 +417,83 @@ function findNearestSection(position: number, sectionPositions: Array<{ position
   } catch (error) {
     console.error('查找最近章节时出错:', error)
     return '未知章节'
+  }
+}
+
+// 获取标题级别
+function getHeadingLevel(styleId: string, styleMap: Map<string, string>): number {
+  try {
+    const styleName = styleMap.get(styleId)
+    if (!styleName) return 1
+    
+    // 从样式名称中提取级别
+    const match = styleName.match(/heading\s*(\d+)/i)
+    if (match) {
+      return parseInt(match[1], 10)
+    }
+    
+    // 如果没有明确的级别，根据样式ID推断
+    if (styleId.includes('1')) return 1
+    if (styleId.includes('2')) return 2
+    if (styleId.includes('3')) return 3
+    if (styleId.includes('4')) return 4
+    if (styleId.includes('5')) return 5
+    if (styleId.includes('6')) return 6
+    
+    return 1 // 默认为1级标题
+  } catch (error) {
+    console.error('获取标题级别时出错:', error)
+    return 1
+  }
+}
+
+// 智能推断章节序号
+function inferSectionNumbers(sections: Array<{ position: number; title: string; level: number }>): Array<{ position: number; title: string; level: number }> {
+  try {
+    const result = [...sections]
+    const counters: number[] = [0, 0, 0, 0, 0, 0] // 支持6级标题
+    
+    for (let i = 0; i < result.length; i++) {
+      const section = result[i]
+      const level = section.level
+      
+      // 增加当前级别的计数器
+      counters[level - 1]++
+      
+      // 重置更深级别的计数器
+      for (let j = level; j < counters.length; j++) {
+        counters[j] = 0
+      }
+      
+      // 检查标题是否已经有序号
+      const hasNumber = /^[\d一二三四五六七八九十IVXLCDM]+[.\s]/.test(section.title)
+      
+      if (!hasNumber) {
+        // 构建序号
+        const numbers = counters.slice(0, level).filter(n => n > 0)
+        const sectionNumber = numbers.join('.')
+        
+        // 添加序号到标题
+        result[i] = {
+          ...section,
+          title: `${sectionNumber} ${section.title}`
+        }
+      } else {
+        // 如果已有序号，尝试从中提取数字更新计数器
+        const numberMatch = section.title.match(/^(\d+(?:\.\d+)*)/);
+        if (numberMatch) {
+          const numbers = numberMatch[1].split('.').map(n => parseInt(n, 10))
+          for (let j = 0; j < numbers.length && j < counters.length; j++) {
+            counters[j] = numbers[j]
+          }
+        }
+      }
+    }
+    
+    console.log('推断的章节序号:', result.map(s => s.title))
+    return result
+  } catch (error) {
+    console.error('推断章节序号时出错:', error)
+    return sections
   }
 } 
