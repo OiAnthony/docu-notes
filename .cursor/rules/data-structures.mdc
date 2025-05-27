@@ -76,8 +76,8 @@ Implemented in [src/utils/exportToExcel.ts](mdc:src/utils/exportToExcel.ts):
 ```typescript
 interface ExcelRow {
   序号: number;        // Row number
-  作者: string;        // Author name
-  批注内容: string;    // Comment text
+  预审者: string;        // Author name
+  预审意见: string;    // Comment text
   创建时间: string;    // Creation date
   上下文: string;      // Context (if available)
 }

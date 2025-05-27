@@ -14,11 +14,11 @@ export function exportToExcel(comments: Comment[]) {
 
       return {
         '批注ID': comment.id,
-        '作者': comment.author,
+        '预审者': comment.author,
         '日期': comment.date,
         '所属章节': comment.section || '未知章节',
-        '批注原文': comment.originalText || '无原文',
-        '批注内容': comment.text,
+        '预审原文': comment.originalText || '无原文',
+        '预审意见': comment.text,
         '答复批注': repliesText
       }
     })
@@ -31,11 +31,11 @@ export function exportToExcel(comments: Comment[]) {
     // 设置列宽
     const colWidths = [
       { wch: 10 }, // 批注ID
-      { wch: 15 }, // 作者
+      { wch: 15 }, // 预审者
       { wch: 20 }, // 日期
       { wch: 30 }, // 所属章节
-      { wch: 40 }, // 批注原文
-      { wch: 50 }, // 批注内容
+      { wch: 40 }, // 预审原文
+      { wch: 50 }, // 预审意见
       { wch: 60 }  // 答复批注
     ]
     ws['!cols'] = colWidths

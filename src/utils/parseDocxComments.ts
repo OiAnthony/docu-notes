@@ -8,7 +8,7 @@ export interface Comment {
   text: string
   paraId?: string
   replies?: Comment[]
-  originalText?: string  // 批注原文
+  originalText?: string  // 预审原文
   section?: string       // 所属章节
 }
 
@@ -70,13 +70,13 @@ export async function parseDocxComments(file: File): Promise<Comment[]> {
     // 解析样式信息
     const styleMap = await parseStyles(zip, parser)
     
-    // 解析文档内容和批注原文、章节信息
+    // 解析文档内容和预审原文、章节信息
     const documentData = await parseDocument(zip, parser, styleMap)
 
     // 解析基础批注数据
     const parsedComments = commentsArray.map((c: CommentData) => ({
       id: c['@_w:id'] || '',
-      author: c['@_w:author'] || '未知作者',
+      author: c['@_w:author'] || '未知预审者',
       date: new Date(c['@_w:date']).toLocaleString('zh-CN'),
       text: extractCommentText(c),
       paraId: extractParaId(c),
@@ -203,7 +203,7 @@ async function parseStyles(zip: JSZip, parser: XMLParser): Promise<Map<string, s
   }
 }
 
-// 解析文档内容，提取批注原文和所属章节
+// 解析文档内容，提取预审原文和所属章节
 async function parseDocument(zip: JSZip, parser: XMLParser, styleMap: Map<string, string>): Promise<{
   commentOriginalTexts: Record<string, string>
   commentSections: Record<string, string>
@@ -244,7 +244,7 @@ async function parseDocument(zip: JSZip, parser: XMLParser, styleMap: Map<string
       console.log(`批注 ${commentId}: 原文="${rangeData.text}", 章节="${section}", 位置=${rangeData.start}`)
     }
 
-    console.log(`解析完成，共提取 ${Object.keys(commentOriginalTexts).length} 个批注原文`)
+    console.log(`解析完成，共提取 ${Object.keys(commentOriginalTexts).length} 个预审原文`)
     return { commentOriginalTexts, commentSections }
   } catch (error) {
     console.error('解析文档内容时出错:', error)
