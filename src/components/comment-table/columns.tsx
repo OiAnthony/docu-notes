@@ -66,7 +66,7 @@ export const columns: ColumnDef<Comment>[] = [
   },
   {
     accessorKey: "originalText",
-    header: "原文",
+    header: "预审原文",
     cell: ({ row }) => {
       const originalText = row.getValue("originalText") as string
       return (
@@ -91,7 +91,7 @@ export const columns: ColumnDef<Comment>[] = [
   },
   {
     accessorKey: "text",
-    header: "批注内容",
+    header: "预审意见",
     cell: ({ row }) => (
       <div className="max-w-md">
         <div className="text-sm leading-relaxed text-foreground">
@@ -141,7 +141,7 @@ export const columns: ColumnDef<Comment>[] = [
     header: ({ column }) => (
       <SortableHeader column={column}>
         <div className="text-sm font-medium">
-          作者
+          预审者
         </div>
       </SortableHeader>
     ),
