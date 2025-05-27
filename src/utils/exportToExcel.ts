@@ -8,14 +8,13 @@ export function exportToExcel(comments: Comment[]) {
       // 格式化答复批注
       const repliesText = comment.replies && comment.replies.length > 0
         ? comment.replies.map(reply =>
-          `${reply.author} (${reply.date}): ${reply.text}`
+          `${reply.author}: ${reply.text}`
         ).join('\n\n')
         : '无答复'
 
       return {
         '批注ID': comment.id,
         '预审者': comment.author,
-        '日期': comment.date,
         '所属章节': comment.section || '未知章节',
         '预审原文': comment.originalText || '无原文',
         '预审意见': comment.text,

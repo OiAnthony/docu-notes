@@ -124,7 +124,7 @@ export const columns: ColumnDef<Comment>[] = [
           {replies.map((reply, index) => (
             <div key={`${reply.id}-${index}`} className="pl-3 border-l border-border">
               <div className="text-xs text-muted-foreground mb-1">
-                {reply.author} · {reply.date}
+                {reply.author}
               </div>
               <div className="text-sm text-foreground/80 leading-relaxed">
                 {reply.text}
@@ -137,7 +137,7 @@ export const columns: ColumnDef<Comment>[] = [
     size: 200,
   },
   {
-    id: "authorAndDate",
+    id: "author",
     header: ({ column }) => (
       <SortableHeader column={column}>
         <div className="text-sm font-medium">
@@ -145,10 +145,9 @@ export const columns: ColumnDef<Comment>[] = [
         </div>
       </SortableHeader>
     ),
-    accessorFn: (row) => `${row.author}_${row.date}`,
+    accessorFn: (row) => `${row.author}`,
     cell: ({ row }) => {
       const author = row.original.author
-      const date = row.original.date
 
       return (
         <div className="min-w-[120px]">
@@ -159,9 +158,6 @@ export const columns: ColumnDef<Comment>[] = [
             <div className="flex-1 min-w-0">
               <div className="font-medium text-sm text-foreground truncate">
                 {author}
-              </div>
-              <div className="text-xs text-muted-foreground truncate">
-                {date}
               </div>
             </div>
           </div>
