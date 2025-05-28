@@ -194,7 +194,7 @@ const baseColumns: ColumnDef<Comment>[] = [
     size: 180,
   },
   {
-    id: "authorAndDate",
+    accessorKey: "author",
     header: ({ column }) => (
       <SortableHeader column={column}>
         <div className="text-sm font-medium">
@@ -202,41 +202,48 @@ const baseColumns: ColumnDef<Comment>[] = [
         </div>
       </SortableHeader>
     ),
-    accessorFn: (row) => `${row.author}_${row.date}`,
     cell: ({ row }) => {
-      const author = row.original.author
-      const date = row.original.date
+      const author = row.getValue("author") as string
 
       return (
-        <div className="min-w-[120px]">
+        <div className="min-w-[100px]">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
               {author.charAt(0).toUpperCase()}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm text-foreground truncate">
-                {author}
-              </div>
-              <div className="text-xs text-muted-foreground truncate">
-                {formatDateToYMD(date)}
-              </div>
+            <div className="font-medium text-sm text-foreground truncate">
+              {author}
             </div>
           </div>
         </div>
       )
     },
-    sortingFn: (rowA, rowB) => {
-      const authorA = rowA.original.author
-      const authorB = rowB.original.author
-      const dateA = new Date(rowA.original.date).getTime()
-      const dateB = new Date(rowB.original.date).getTime()
+    size: 120,
+  },
+  {
+    accessorKey: "date",
+    header: ({ column }) => (
+      <SortableHeader column={column}>
+        <div className="text-sm font-medium">
+          预审时间
+        </div>
+      </SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const date = row.getValue("date") as string
 
-      if (authorA !== authorB) {
-        return authorA.localeCompare(authorB)
-      }
+      return (
+        <div className="text-sm text-muted-foreground min-w-[90px]">
+          {formatDateToYMD(date)}
+        </div>
+      )
+    },
+    sortingFn: (rowA, rowB) => {
+      const dateA = new Date(rowA.getValue("date") as string).getTime()
+      const dateB = new Date(rowB.getValue("date") as string).getTime()
       return dateB - dateA
     },
-    size: 140,
+    size: 100,
   },
   {
     accessorKey: "text",
@@ -247,9 +254,6 @@ const baseColumns: ColumnDef<Comment>[] = [
           <div className="whitespace-pre-wrap break-words">
             {row.getValue("text")}
           </div>
-        </div>
-        <div className="text-xs text-muted-foreground mt-2 sm:hidden">
-          {formatDateToYMD(row.original.date)}
         </div>
       </div>
     ),
