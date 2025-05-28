@@ -1,5 +1,5 @@
 import type { Comment } from '@/utils/parseDocxComments'
-import { columns } from './columns'
+import { generateColumns } from './columns'
 import { DataTable } from './data-table'
 
 interface CommentsTableProps {
@@ -7,5 +7,6 @@ interface CommentsTableProps {
 }
 
 export function CommentTable({ data }: CommentsTableProps) {
+  const columns = generateColumns(data)
   return <DataTable columns={columns} data={data} />
 } 
