@@ -305,19 +305,74 @@ function extractTextFromXmlRange(xmlRange: string): string {
       return '【图片】'
     }
 
-    // 查找所有 w:t 标签中的文本
-    const textMatches = [...xmlRange.matchAll(/<w:t[^>]*>(.*?)<\/w:t>/g)]
-    const text = textMatches.map(match => match[1]).join('').trim()
+    // 1. 首先尝试提取所有 w:t 标签中的文本
+    const textMatches = [...xmlRange.matchAll(/<w:t[^>]*>(.*?)<\/w:t>/gs)]
+    let extractedText = textMatches.map(match => match[1]).join('').trim()
 
-    // 如果没有文本但有其他内容，可能是图片或其他元素
-    if (!text && xmlRange.length > 100) { // 如果XML内容较长但没有文本，可能是图片
+    // 如果找到了文本，还需要进一步清理可能包含的XML片段
+    if (extractedText) {
+      // 检查提取的文本中是否仍然包含XML标签
+      if (extractedText.includes('<') && extractedText.includes('>')) {
+        // 继续清理嵌套的XML标签
+        extractedText = cleanXmlContent(extractedText)
+      }
+      
+      if (extractedText.trim()) {
+        return extractedText.trim()
+      }
+    }
+
+    // 2. 如果没有找到 w:t 标签或提取的内容为空，使用更强力的方法
+    const cleanedText = cleanXmlContent(xmlRange)
+
+    // 3. 如果仍然没有文本但有其他内容，可能是图片或其他元素
+    if (!cleanedText && xmlRange.length > 100) {
       return '【图片】'
     }
 
-    return text
+    return cleanedText
   } catch (error) {
     console.error('从XML范围提取文本时出错:', error)
     return ''
+  }
+}
+
+// 强力清理XML内容的辅助函数
+function cleanXmlContent(content: string): string {
+  try {
+    let cleaned = content
+
+    // 1. 移除所有自闭合标签（如 <w:tcPr ... />）
+    cleaned = cleaned.replace(/<[^>]+\/>/g, ' ')
+
+    // 2. 移除所有开始和结束标签对，使用多次迭代确保嵌套标签被完全移除
+    let previousLength = 0
+    while (cleaned.length !== previousLength && cleaned.includes('<')) {
+      previousLength = cleaned.length
+      // 移除成对的标签
+      cleaned = cleaned.replace(/<[^>]*>.*?<\/[^>]*>/gs, ' ')
+      // 移除剩余的单独标签
+      cleaned = cleaned.replace(/<[^>]*>/g, ' ')
+    }
+
+    // 3. 解码 XML 实体
+    cleaned = cleaned
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&nbsp;/g, ' ')
+
+    // 4. 清理多余的空白字符
+    cleaned = cleaned
+      .replace(/\s+/g, ' ')
+      .trim()
+
+    return cleaned
+  } catch (error) {
+    console.error('清理XML内容时出错:', error)
+    return content
   }
 }
 
