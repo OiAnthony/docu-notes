@@ -22,10 +22,21 @@ interface CommentData {
 interface ParagraphData {
   'w:r': RunData | RunData[];
   '@_w14:paraId'?: string;
+  'w:pPr'?: {
+    'w:pStyle'?: { '@_w:val': string };
+    'w:rPr'?: object;
+    'w:ind'?: { '@_w:firstLine'?: string };
+    [key: string]: unknown;
+  }; // 段落属性
 }
 
 interface RunData {
-  'w:t': string | string[];
+  'w:t': string | string[] | { '#text': string; '@_xml:space'?: string };
+  'w:rPr'?: {
+    'w:rFonts'?: { '@_w:hint'?: string; '@_w:eastAsia'?: string };
+    'w:lang'?: { '@_w:val'?: string; '@_w:eastAsia'?: string };
+    [key: string]: unknown;
+  }; // 运行属性
 }
 
 interface CommentExtendedData {
@@ -138,19 +149,32 @@ function extractCommentText(comment: CommentData): string {
   try {
     const paragraphs = Array.isArray(comment['w:p']) ? comment['w:p'] : [comment['w:p']]
 
-    return paragraphs
+    const text = paragraphs
       .map((p: ParagraphData) => {
         if (!p) return ''
         const runs = Array.isArray(p['w:r']) ? p['w:r'] : [p['w:r']]
         return runs
           .map((r: RunData) => {
-            if (!r) return ''
-            return Array.isArray(r['w:t']) ? r['w:t'].join('') : r['w:t'] || ''
+            if (!r || !r['w:t']) return ''
+
+            // 处理 w:t 的不同格式
+            const textContent = r['w:t']
+            if (typeof textContent === 'string') {
+              return textContent
+            } else if (Array.isArray(textContent)) {
+              return textContent.join('')
+            } else if (typeof textContent === 'object' && textContent['#text']) {
+              return textContent['#text']
+            }
+
+            return ''
           })
           .join('')
       })
       .join('\n')
       .trim()
+
+    return text
   } catch (error) {
     console.error('提取批注文本时出错:', error)
     return '批注文本解析失败'
@@ -316,7 +340,7 @@ function extractTextFromXmlRange(xmlRange: string): string {
         // 继续清理嵌套的XML标签
         extractedText = cleanXmlContent(extractedText)
       }
-      
+
       if (extractedText.trim()) {
         return extractedText.trim()
       }
